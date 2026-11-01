@@ -41,6 +41,11 @@ sites/agent-good/      # сайт с agent-стандартами
 work/test-sites/       # user-spec
 ```
 
+## Доверие для pi
+
+Перед первым запуском `pi`: выполнить `pi`, затем `/trust`, либо запускать с
+`--approve`. Без этого `pi` пропускает `.agents/skills/`.
+
 ## Ограничение
 
 `check.mjs` не рендерит JS: он показывает, что SPA и hostile не отдают факты в
