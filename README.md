@@ -10,7 +10,7 @@ agent-readiness. Нужны, чтобы проверять краулер, из�
 npm start
 ```
 
-Поднимает пять сайтов:
+Поднимает шесть сайтов:
 
 | Порт | Сайт | Технология | Что проверяет |
 |---|---|---|---|
@@ -19,6 +19,7 @@ npm start
 | 4103 | ssr | серверный рендер | контент в первом ответе, без JS |
 | 4104 | hostile | JS + защита | robots запрещает AI-ботов, 403 для их UA |
 | 4105 | agent-good | HTML + agent-стандарты | llms.txt, OpenAPI, MCP card, API catalog |
+| 4106 | traps | набор ловушек | soft 404, редиректы, challenge, UA-cloaking, rate limit, canonical, shadow DOM, iframe, регион, A/B, пагинация |
 
 ## Проверка
 
@@ -34,11 +35,11 @@ npm run check
 ## Структура
 
 ```
-serve.mjs              # пять HTTP-серверов без зависимостей
+serve.mjs              # шесть HTTP-серверов без зависимостей
 check.mjs              # проверка статусов и контента
 sites/static/          # статический сайт
 sites/agent-good/      # сайт с agent-стандартами
-work/test-sites/       # user-spec
+work/test-sites/       # user-spec и research-parsing-traps.md
 ```
 
 ## Доверие для pi

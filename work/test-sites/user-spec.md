@@ -15,6 +15,7 @@ agent-readiness, чтобы проверять на них краулер, из�
 | 4103 | ssr | серверный рендер без JS | контент в первом ответе, нет JS-зависимости |
 | 4104 | hostile | JS + защита | robots запрещает AI-ботов, 403 для их UA, нет schema/sitemap |
 | 4105 | agent-good | статический HTML + agent-стандарты | llms.txt, OpenAPI, MCP server card, API catalog, Content-Signal |
+| 4106 | traps | HTML + JS | soft 404, редиректы, challenge, UA-cloaking, rate limit, canonical, shadow DOM, iframe, регион, A/B, пагинация, разный бизнес-контент |
 
 ## Поведение
 
