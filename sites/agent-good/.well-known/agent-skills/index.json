@@ -1,0 +1,14 @@
+{
+  "skills": [
+    {
+      "name": "pricing",
+      "description": "Тарифы Acme Cloud и условия оплаты.",
+      "url": "http://localhost:4105/skills/pricing.md"
+    },
+    {
+      "name": "delivery",
+      "description": "Сроки и стоимость доставки.",
+      "url": "http://localhost:4105/skills/delivery.md"
+    }
+  ]
+}

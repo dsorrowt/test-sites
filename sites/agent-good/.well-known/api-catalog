@@ -1,0 +1,19 @@
+{
+  "linkset": [
+    {
+      "anchor": "http://localhost:4105/",
+      "service-desc": [
+        {
+          "href": "http://localhost:4105/openapi.json",
+          "type": "application/openapi+json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "http://localhost:4105/llms.txt",
+          "type": "text/plain"
+        }
+      ]
+    }
+  ]
+}

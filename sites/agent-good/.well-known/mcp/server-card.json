@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/mcp-server-card/v1.json",
+  "version": "1.0",
+  "protocolVersion": "2025-06-18",
+  "serverInfo": {
+    "name": "acme-cloud-mcp",
+    "title": "Acme Cloud MCP",
+    "version": "1.0.0"
+  },
+  "description": "Тарифы и условия Acme Cloud для AI-агентов.",
+  "transport": {
+    "type": "streamable-http",
+    "endpoint": "/mcp"
+  },
+  "authentication": {
+    "required": false
+  },
+  "tools": [
+    {
+      "name": "list_products",
+      "title": "List products",
+      "description": "Возвращает тарифы Acme Cloud.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  ]
+}

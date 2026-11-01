@@ -1,0 +1,13 @@
+# Acme Cloud
+> Облачная платформа для команд. Цена от 4 900 ₽/мес.
+
+## Основное
+- [Главная](http://localhost:4105/): описание продукта.
+- [OpenAPI](http://localhost:4105/openapi.json): спецификация API.
+- [MCP Server Card](http://localhost:4105/.well-known/mcp/server-card.json): описание MCP-сервера.
+- [API Catalog](http://localhost:4105/.well-known/api-catalog): каталог API.
+
+## Факты
+- Цена Start — 4 900 ₽/мес.
+- Доставка по Москве — 1–2 дня.
+- Возврат — 14 дней.

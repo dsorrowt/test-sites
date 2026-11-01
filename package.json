@@ -1,0 +1,9 @@
+{
+  "name": "test-sites",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node serve.mjs",
+    "check": "node check.mjs"
+  }
+}
