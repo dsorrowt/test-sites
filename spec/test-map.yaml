@@ -1,0 +1,195 @@
+# Contract between botprobe and test-sites.
+# Routes, scenarios and expectations live here, never in the botprobe registry.
+# The only shared key with botprobe is the trap id.
+
+version: 1
+
+fixtures:
+  static: http://localhost:4101
+  spa: http://localhost:4102
+  ssr: http://localhost:4103
+  hostile: http://localhost:4104
+  agent_good: http://localhost:4105
+  traps: http://localhost:4106
+
+traps:
+  - id: http.soft_404
+    route: /soft-404
+    scenario: GET returns 200 with a "not found" page instead of 404.
+    expect:
+      status: 200
+      body_contains:
+        - "Страница не найдена"
+      is_trap: true
+
+  - id: http.redirect.chain
+    route: /redirect
+    scenario: Follow 301 -> 302 -> 307 -> 200 and record every hop.
+    expect:
+      statuses: [301, 302, 307, 200]
+      final_path: /final
+      final_body_contains:
+        - "4 900"
+      is_trap: false
+
+  - id: http.redirect.loop
+    route: /loop
+    scenario: 307 points to itself; the crawler must stop at its redirect limit.
+    expect:
+      status: 307
+      location: /loop
+      max_redirects_reached: true
+      is_trap: true
+
+  - id: antibot.ua_cloak
+    route: /ua-cloak
+    scenario: Compare a browser-like request with a declared bot User-Agent.
+    probes:
+      - kind: ua
+        name: User-Agent
+        value: "Mozilla/5.0 (compatible; GPTBot/1.0; +https://openai.com/gptbot)"
+    expect:
+      status: 200
+      browser_body_contains:
+        - "4 900"
+      bot_body_contains:
+        - "9 900"
+      is_trap: true
+
+  - id: antibot.challenge.cookie
+    route: /challenge
+    scenario: First request is 401 with Set-Cookie pass=1; a second request with the cookie returns content.
+    expect:
+      first_status: 401
+      set_cookie_contains: "pass=1"
+      final_status: 200
+      final_body_contains:
+        - "4 900"
+      is_trap: true
+
+  - id: http.rate_limit.retry_after
+    route: /rate
+    scenario: Four quick requests; the fourth is 429 with Retry-After 60.
+    requests: 4
+    expect:
+      statuses: [200, 200, 200, 429]
+      retry_after: "60"
+      is_trap: true
+
+  - id: seo.canonical.multiple
+    route: /canonical-trap
+    scenario: The page declares two different canonical URLs.
+    expect:
+      status: 200
+      canonical_count: 2
+      canonical_values:
+        - "https://example.com/a"
+        - "https://example.com/b"
+      is_trap: true
+
+  - id: seo.hreflang.multiple
+    route: /hreflang
+    scenario: The page declares ru, en and x-default alternates.
+    expect:
+      status: 200
+      hreflang_count: 3
+      hreflang_values: [ru, en, x-default]
+      is_trap: false
+
+  - id: content.hidden_text
+    route: /hidden
+    scenario: A visible price of 4 900 and a display:none price of 1.
+    expect:
+      status: 200
+      visible_body_contains:
+        - "4 900"
+      hidden_body_contains:
+        - "Цена 1 ₽"
+      is_trap: true
+
+  - id: render.shadow_dom
+    route: /shadow
+    scenario: The price exists only inside an open shadow root created by JS.
+    requires_js: true
+    expect:
+      status: 200
+      shadow_body_contains:
+        - "4 900"
+      is_trap: true
+
+  - id: render.iframe
+    route: /iframe
+    scenario: The price is inside /iframe-content loaded by an iframe.
+    requires_js: true
+    expect:
+      status: 200
+      iframe_src: /iframe-content
+      iframe_body_contains:
+        - "4 900"
+      is_trap: true
+
+  - id: render.js_schema
+    route: /js-schema
+    scenario: JSON-LD Product/Offer is injected by JS after load.
+    requires_js: true
+    expect:
+      status: 200
+      structured_data_type: Product
+      structured_data_price: "4900"
+      is_trap: true
+
+  - id: render.cookie_wall
+    route: /cookie-wall
+    scenario: Content is display:none until the consent overlay is dismissed.
+    requires_js: true
+    expect:
+      status: 200
+      before_body_contains:
+        - "Примите cookie"
+      after_click_body_contains:
+        - "4 900"
+      is_trap: true
+
+  - id: content.region_gate
+    route: /region
+    scenario: Default page shows a city modal and 4 900; region=spb shows 5 900.
+    probes:
+      - kind: query
+        name: region
+        value: spb
+    expect:
+      status: 200
+      default_body_contains:
+        - "Выберите город"
+        - "4 900"
+      variant_body_contains:
+        - "5 900"
+      is_trap: true
+
+  - id: content.ab_variant
+    route: /ab
+    scenario: Default shows 4 900; cookie ab=B shows 5 900.
+    probes:
+      - kind: cookie
+        name: ab
+        value: B
+    expect:
+      status: 200
+      default_body_contains:
+        - "4 900"
+      variant_body_contains:
+        - "5 900"
+      is_trap: true
+
+  - id: render.infinite_scroll
+    route: /infinite
+    scenario: The first page has one item; clicking "Показать ещё" fetches two more from /api/items?page=2.
+    requires_js: true
+    expect:
+      status: 200
+      before_items: 1
+      after_click_items: 3
+      items_contain:
+        - "Товар 2"
+        - "Товар 3"
+      is_trap: true
