@@ -1,0 +1,42 @@
+# Contract for content-question-bank runs.
+# Values are deterministic fixture expectations; the crawler never reads this file.
+
+version: 1
+
+fixtures:
+  static: http://localhost:4101
+  ssr: http://localhost:4103
+  agent_good: http://localhost:4105
+
+expectations:
+  - fixture: static
+    pages:
+      - path: /pricing
+        category: offerings
+        spans:
+          - context_contains: "Start"
+            quote_contains: "4 900"
+          - context_contains: "Growth"
+            quote_contains: "9 900"
+        questions:
+          min: 2
+          require_answer_in_quote: true
+      - path: /delivery
+        category: terms
+        spans:
+          - quote_contains: "1–2"
+      - path: /returns
+        category: terms
+        spans:
+          - quote_contains: "14"
+  - fixture: ssr
+    pages:
+      - path: /
+        category: offerings
+        spans:
+          - quote_contains: "4 900"
+  - fixture: agent_good
+    pages:
+      - path: /
+        spans:
+          - quote_contains: "4 900"
