@@ -245,37 +245,11 @@ const CONTENT_PAGES = {
       <p>Гарантированная доступность — 99,9% в месяц.</p>
       <p>При недоступности ниже SLA клиент получает кредит 10% от месячной платы.</p>`,
   },
-  '/integrations': {
-    title: 'Интеграции — Acme Cloud',
-    body: `<h1>Интеграции</h1>
-      <p>Поддерживаются Slack, GitHub, Jira и Zapier.</p>
-      <p>Вебхуки можно настроить на любом тарифе.</p>`,
-  },
-  '/api': {
-    title: 'API — Acme Cloud',
-    body: `<h1>API</h1>
-      <p>REST API использует токен-аутентификацию.</p>
-      <p>Лимит — 1000 запросов в час на один токен.</p>
-      <p>Спецификация OpenAPI доступна по адресу /openapi.json.</p>`,
-  },
-  '/changelog': {
-    title: 'Changelog — Acme Cloud',
-    body: `<h1>Changelog</h1>
-      <p>Версия 2.4 выпущена 1 октября 2026 года.</p>
-      <p>В новой версии появился обновлённый дашборд и экспорт отчётов.</p>`,
-  },
-  '/docs': {
-    title: 'Документация — Acme Cloud',
-    body: `<h1>Документация</h1>
-      <p>Быстрый старт занимает 5 минут.</p>
-      <p>Доступны SDK для Python и JavaScript.</p>`,
-  },
-  '/about': {
-    title: 'О компании — Acme Cloud',
-    body: `<h1>О компании</h1>
-      <p>Acme Cloud основана в 2020 году.</p>
-      <p>В компании работает 50 сотрудников, головной офис находится в Берлине.</p>`,
-  },
+
+
+
+
+
 };
 
 function contentPage(pathname) {
@@ -293,11 +267,7 @@ function trapsHandler(req, res) {
       200,
       trapPage(
         'Traps',
-        '<h1>Traps</h1><ul>' +
-          ['soft-404', 'redirect', 'loop', 'ua-cloak', 'challenge', 'rate', 'canonical-trap', 'hreflang', 'hidden', 'shadow', 'iframe', 'js-schema', 'cookie-wall', 'region', 'ab', 'infinite', 'clinic', 'travel', 'shop', 'saas']
-            .map((p) => `<li><a href="/${p}">/${p}</a></li>`)
-            .join('') +
-          '</ul><h2>Контент</h2><ul>' +
+        '<h1>Acme Cloud</h1><ul>' +
           Object.keys(CONTENT_PAGES).map((p) => `<li><a href="${p}">${p}</a></li>`).join('') +
           '</ul>',
       ),
