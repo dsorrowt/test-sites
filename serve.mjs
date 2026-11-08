@@ -209,6 +209,79 @@ let rateHits = 0;
 const trapPage = (title, body) =>
   `<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>${title}</title></head><body>${body}</body></html>`;
 
+const CONTENT_PAGES = {
+  '/pricing': {
+    title: 'Тарифы — Acme Cloud',
+    body: `<h1>Тарифы Acme Cloud</h1>
+      <p>Start стоит 4 900 ₽ в месяц и включает 5 пользователей.</p>
+      <p>Growth стоит 9 900 ₽ в месяц и включает 25 пользователей.</p>
+      <p>Enterprise стоит 24 900 ₽ в месяц и включает неограниченное число пользователей.</p>
+      <p>При оплате за год действует скидка 20%.</p>`,
+  },
+  '/features': {
+    title: 'Возможности — Acme Cloud',
+    body: `<h1>Возможности</h1>
+      <p>Каждый тариф включает 10 ГБ хранилища.</p>
+      <p>API доступен на всех тарифах, начиная с Start.</p>
+      <p>SSO и журнал аудита доступны на Growth и Enterprise.</p>`,
+  },
+  '/security': {
+    title: 'Безопасность — Acme Cloud',
+    body: `<h1>Безопасность</h1>
+      <p>Acme Cloud сертифицирован по SOC 2 Type II.</p>
+      <p>Данные шифруются алгоритмом AES-256 при хранении и TLS 1.3 при передаче.</p>
+      <p>Резервные копии создаются ежедневно и хранятся 30 дней.</p>`,
+  },
+  '/support': {
+    title: 'Поддержка — Acme Cloud',
+    body: `<h1>Поддержка</h1>
+      <p>Почта отвечает в течение 24 часов.</p>
+      <p>Чат отвечает в течение 1 часа.</p>
+      <p>Телефонная поддержка работает с 09:00 до 18:00 UTC.</p>`,
+  },
+  '/sla': {
+    title: 'SLA — Acme Cloud',
+    body: `<h1>SLA</h1>
+      <p>Гарантированная доступность — 99,9% в месяц.</p>
+      <p>При недоступности ниже SLA клиент получает кредит 10% от месячной платы.</p>`,
+  },
+  '/integrations': {
+    title: 'Интеграции — Acme Cloud',
+    body: `<h1>Интеграции</h1>
+      <p>Поддерживаются Slack, GitHub, Jira и Zapier.</p>
+      <p>Вебхуки можно настроить на любом тарифе.</p>`,
+  },
+  '/api': {
+    title: 'API — Acme Cloud',
+    body: `<h1>API</h1>
+      <p>REST API использует токен-аутентификацию.</p>
+      <p>Лимит — 1000 запросов в час на один токен.</p>
+      <p>Спецификация OpenAPI доступна по адресу /openapi.json.</p>`,
+  },
+  '/changelog': {
+    title: 'Changelog — Acme Cloud',
+    body: `<h1>Changelog</h1>
+      <p>Версия 2.4 выпущена 1 октября 2026 года.</p>
+      <p>В новой версии появился обновлённый дашборд и экспорт отчётов.</p>`,
+  },
+  '/docs': {
+    title: 'Документация — Acme Cloud',
+    body: `<h1>Документация</h1>
+      <p>Быстрый старт занимает 5 минут.</p>
+      <p>Доступны SDK для Python и JavaScript.</p>`,
+  },
+  '/about': {
+    title: 'О компании — Acme Cloud',
+    body: `<h1>О компании</h1>
+      <p>Acme Cloud основана в 2020 году.</p>
+      <p>В компании работает 50 сотрудников, головной офис находится в Берлине.</p>`,
+  },
+};
+
+function contentPage(pathname) {
+  return CONTENT_PAGES[pathname];
+}
+
 function trapsHandler(req, res) {
   const { pathname, searchParams } = new URL(req.url, 'http://local');
   const ua = req.headers['user-agent'] || '';
@@ -224,9 +297,29 @@ function trapsHandler(req, res) {
           ['soft-404', 'redirect', 'loop', 'ua-cloak', 'challenge', 'rate', 'canonical-trap', 'hreflang', 'hidden', 'shadow', 'iframe', 'js-schema', 'cookie-wall', 'region', 'ab', 'infinite', 'clinic', 'travel', 'shop', 'saas']
             .map((p) => `<li><a href="/${p}">/${p}</a></li>`)
             .join('') +
+          '</ul><h2>Контент</h2><ul>' +
+          Object.keys(CONTENT_PAGES).map((p) => `<li><a href="${p}">${p}</a></li>`).join('') +
           '</ul>',
       ),
     );
+  }
+
+  if (pathname === '/robots.txt') {
+    return send(res, 200, 'User-agent: *\nAllow: /\nSitemap: http://localhost:4106/sitemap.xml\n', {
+      'content-type': MIME['.txt'],
+    });
+  }
+  if (pathname === '/sitemap.xml') {
+    const urls = ['/', ...Object.keys(CONTENT_PAGES)]
+      .map((p) => `<url><loc>http://localhost:4106${p}</loc></url>`)
+      .join('');
+    return send(res, 200, `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`, {
+      'content-type': MIME['.xml'],
+    });
+  }
+  const page = contentPage(pathname);
+  if (page) {
+    return send(res, 200, trapPage(page.title, page.body));
   }
 
   if (pathname === '/soft-404') {
