@@ -193,3 +193,19 @@ traps:
         - "Товар 2"
         - "Товар 3"
       is_trap: true
+
+# Сигнатура исходящего запроса: проверяется отдельно от трапов.
+signature:
+  fixture: traps
+  route: /echo-headers
+  expect:
+    absent:
+      - via
+      - x-forwarded-for
+    present:
+      - accept-language
+      - sec-ch-ua
+      - sec-fetch-site
+      - user-agent
+    user_agent_contains: "Windows NT"
+    accept_language_starts_with: "ru-RU"

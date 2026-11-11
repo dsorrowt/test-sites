@@ -206,17 +206,32 @@ function hostileHandler(req, res) {
 
 let rateHits = 0;
 
-const trapPage = (title, body) =>
-  `<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>${title}</title></head><body>${body}</body></html>`;
+const trapPage = (title, body, head = '') =>
+  `<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>${title}</title>${head}</head><body>${body}</body></html>`;
+
+const TRAP_PAGES = [
+  '/soft-404',
+  '/redirect',
+  '/loop',
+  '/ua-cloak',
+  '/challenge',
+  '/rate',
+  '/canonical-trap',
+  '/hreflang',
+  '/hidden',
+  '/shadow',
+];
 
 const CONTENT_PAGES = {
   '/pricing': {
     title: 'Тарифы — Acme Cloud',
+    head: '<link rel="canonical" href="https://example.com/a"><link rel="canonical" href="https://example.com/b">',
     body: `<h1>Тарифы Acme Cloud</h1>
       <p>Start стоит 4 900 ₽ в месяц и включает 5 пользователей.</p>
       <p>Growth стоит 9 900 ₽ в месяц и включает 25 пользователей.</p>
       <p>Enterprise стоит 24 900 ₽ в месяц и включает неограниченное число пользователей.</p>
-      <p>При оплате за год действует скидка 20%.</p>`,
+      <p>При оплате за год действует скидка 20%.</p>
+      <div style="display:none">Цена 1 ₽</div>`,
   },
   '/features': {
     title: 'Возможности — Acme Cloud',
@@ -268,7 +283,9 @@ function trapsHandler(req, res) {
       trapPage(
         'Traps',
         '<h1>Acme Cloud</h1><ul>' +
-          Object.keys(CONTENT_PAGES).map((p) => `<li><a href="${p}">${p}</a></li>`).join('') +
+          [...Object.keys(CONTENT_PAGES), ...TRAP_PAGES]
+            .map((p) => `<li><a href="${p}">${p}</a></li>`)
+            .join('') +
           '</ul>',
       ),
     );
@@ -289,9 +306,16 @@ function trapsHandler(req, res) {
   }
   const page = contentPage(pathname);
   if (page) {
-    return send(res, 200, trapPage(page.title, page.body));
+    return send(res, 200, trapPage(page.title, page.body, page.head));
   }
 
+  if (pathname === '/echo-headers') {
+    // Сигнатура запроса: заголовки, которые реально дошли до цели. Cookie не возвращаются.
+    const headers = Object.fromEntries(
+      Object.entries(req.headers).filter(([name]) => name !== 'cookie'),
+    );
+    return json(res, 200, { headers });
+  }
   if (pathname === '/soft-404') {
     return send(res, 200, trapPage('Страница не найдена', '<h1>Страница не найдена</h1>'));
   }
